@@ -1,5 +1,5 @@
 -- Just a simple module to offer the version of the current OneLuaPro distribution
 local distro = {
-   _VERSION = "@ONELUAPRO_VERSION@"
+   _VERSION = "OneLuaPro @ONELUAPRO_VERSION@"
 }
 return distro
