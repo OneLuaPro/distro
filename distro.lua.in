@@ -2,4 +2,26 @@
 local distro = {
    _VERSION = "OneLuaPro @ONELUAPRO_VERSION@"
 }
+
+-- Some further useful extensions to Lua
+function  distro.printf(s,...)
+   -- printf()
+   return io.write(s:format(...))
+end
+
+function distro.printff(s,...)
+   -- printf() with flush()
+   return io.write(s:format(...)):flush()
+end
+
+function distro.indentprintff(indent,s,...)
+   -- indented printf() with flush()
+   local fmt = {}
+   for i=1, math.floor(indent) do
+      fmt[i] = " "
+   end
+   fmt[#fmt+1] = s
+   return io.write(table.concat(fmt):format(...)):flush()
+end
+
 return distro
