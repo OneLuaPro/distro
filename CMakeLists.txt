@@ -116,6 +116,13 @@ message(STATUS "C compiler flags: ${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD
 IF(NOT ONELUAPRO_VERSION)  
   message(FATAL_ERROR "Variable ONELUAPRO_VERSION is not set - cannot continue.")
 ENDIF()
+# Check if we have a release candidate suffix from command-line variable
+string(LENGTH "${ONELUAPRO_CANDIDATE}" suffix_len)
+IF(suffix_len GREATER 0)
+  message(STATUS "Using release candidate suffix ${ONELUAPRO_CANDIDATE}.")
+  set(ONELUAPRO_VERSION "${ONELUAPRO_VERSION}-${ONELUAPRO_CANDIDATE}")
+  message(STATUS "Release string is: ${ONELUAPRO_VERSION}")
+ENDIF()
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/distro.lua.in
   ${CMAKE_CURRENT_BINARY_DIR}/distro.lua
