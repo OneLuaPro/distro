@@ -4,77 +4,85 @@ local lanes = require("lanes").configure()
 local wx = require("wx")
 local bridge = require("wxLanesBridge").init(wx.wxEVT_THREAD)
 
-local handles = {}
-local values = {}
+local guiReceivers = {}
+local guiValues = {}
 
-function appWorkerThread.registerHandle(key, value)
-   -- registers GUI handles which may receive thread events
-   handles[key] = value
+function appWorkerThread.registerReceiver(key, value)
+   -- registers GUI handles which may receive wxThreadEvents
+   -- convert receiver handles to actual c++ addresses
+   local ptr = bridge.getPointer(value)
+   if not ptr then
+      wx.wxMessageBox("A critical Runtime Error has occurred in appWorkerThread.registerReceiver().",
+		      "Runtime Error",
+		      wx.wxOK + wx.wxICON_ERROR)
+      os.exit(1)
+   end
+   guiReceivers[key] = ptr
 end
 
 function appWorkerThread.registerValues(key, value)
    -- registers GUI values which are used inside worker thread
-   values[key] = value
+   guiValues[key] = value
 end
 
-local function task(logWinPtr,btnPtr,sbPtr,dllPath,rootPath,
-		    passfailDllPtr)
+local function task(receiver, values)
    -- this is what the thread shall do
    local b = require "wxLanesBridge"
+   local VERSION = require("distro")._VERSION
    local dc = require("distro.core")
    local lfs = require("lfs")
    local openssl = require("openssl")
    local tablex = require("pl.tablex")
    -- helper func to redirect thread output to receiving widget logOutput
    local function  printf(fmt,...)
-      b.postEvent(logWinPtr,{s=fmt:format(...)})
+      b.postEvent(receiver.logOutput,{s=fmt:format(...)})
    end
    -- commonly used outtro steps
    local function outtro()
-      b.postEvent(btnPtr,{i=1})	-- enable runButton
-      b.postEvent(sbPtr,{s="Idle"})
-      printf("")
-      -- FIXME
-      -- Add trigger to display final resutl here...
+      b.postEvent(receiver.runButton,{i=1})	-- enable runButton
+      b.postEvent(receiver.statusBar,{s="Idle"})
    end
    local dllOk, errmsg, dllDigests
 
    -- Intro: GUI-Update runButton and statusBar
-   b.postEvent(btnPtr,{i=0})	-- disable runButton
-   b.postEvent(sbPtr,{s="Running"})
+   b.postEvent(receiver.runButton,{i=0})	-- disable runButton
+   b.postEvent(receiver.statusBar,{s="Running"})
 
    -- Step 1: Check integrity of chksum.dll at OneLuaPro base installation folder
-   printf("Checking integrity of %s : ",dllPath)
-   dllOk, errmsg = dc.verify(dllPath)
+   printf("Checking integrity of %s : ",values.dllPath)
+   dllOk, errmsg = dc.verify(values.dllPath)
    if dllOk then
       printf("PASS\n")
-      b.postEvent(passfailDllPtr,{s="PASS",i=1})
+      b.postEvent(receiver.passfailDll,{s="PASS",i=1})
    else
       printf("FAIL : Error message : %s\n",errmsg)
-      b.postEvent(passfailDllPtr,{s="FAIL",i=0})
+      b.postEvent(receiver.passfailDll,{s="FAIL",i=0})
+      b.postEvent(receiver.finalResult,{s="The Checksum Container is corrupted.",i=0})
       outtro()
-      return
+      return	-- ends the thread prematurely
    end
 
    -- Step 2: Read checksums from DLL - these are the set values. If successful,
    -- the values in dllDigests are the relative paths with "\" as path separator
-   printf("Reading SHA256 set values from %s : ",dllPath)
-   dllDigests, errmsg = dc.getHashes(dllPath, true) -- table[path] = hash
+   printf("Reading SHA256 set values from %s : ",values.dllPath)
+   dllDigests, errmsg = dc.getHashes(values.dllPath, true) -- table[path] = hash
    if dllDigests then
       printf("DONE\n")
    else
       printf("FAIL : Error message : %s\n",errmsg)
+      b.postEvent(receiver.passfailDll,{s="FAIL",i=0})
+      b.postEvent(receiver.finalResult,{s="The Checksum File does not contain Checksums.",i=0})
       outtro()
-      return
+      return	-- ends the thread prematurely
    end
 
    -- Step 3: Recursive directory traversal from start with concurrent SHA256
    -- calculation
-   printf("Calculating SHA256 values from start directory %s : ",rootPath)
+   printf("Calculating SHA256 values from start directory %s : ",values.rootPath)
    local digest = openssl.digest.new("SHA256")
    local cntFiles = 0
    -- prefixPattern to remove leading installation path prefix
-   local prefixPattern = "^" .. (rootPath.."\\"):gsub("\\", "%%\\")	-- constant
+   local prefixPattern = "^" .. (values.rootPath.."\\"):gsub("\\", "%%\\")	-- constant
    local lockedByOtherProcs = {}
    local lockedByOtherProcsCnt = 0
    -- define recursive function
@@ -125,7 +133,7 @@ local function task(logWinPtr,btnPtr,sbPtr,dllPath,rootPath,
       return fileList
    end
 
-   local fileList = getFilesRecursive(rootPath)
+   local fileList = getFilesRecursive(values.rootPath)
    printf(" DONE\n")
 
    -- Step 4: Compare hashes from all found files with hashes from DLL
@@ -161,34 +169,36 @@ local function task(logWinPtr,btnPtr,sbPtr,dllPath,rootPath,
       onlyOnDiskCnt = onlyOnDiskCnt -1
    end
 
-   -- DEBUG
-   printf("passCnt               = %d\n",passCnt)
-   printf("failCnt               = %d\n",failCnt)
-   printf("onlyOnDiskCnt         = %d\n",onlyOnDiskCnt)
-   printf("onlyInHashCnt         = %d\n",onlyInHashCnt)
-   printf("lockedByOtherProcsCnt = %d\n",lockedByOtherProcsCnt)
+   -- Step 5: Update summary widgets on GUI with obtained results
+   -- We use all capabilities of .postEvent() to ease the update of GUI elements
+   -- .s = index of target widget in appSummaryWidgets()
+   -- .i = desired color of widget text (-1 = default)
+   -- .l = the actual number to be displayed
+   b.postEvent(receiver.passCnt,{s="passCnt",i=-1,l=passCnt})
+   b.postEvent(receiver.failCnt,{s="failCnt",i=-1,l=failCnt})
+   b.postEvent(receiver.onlyOnDiskCnt,{s="onlyOnDiskCnt",i=-1,l=onlyOnDiskCnt})
+   b.postEvent(receiver.onlyInHashCnt,{s="onlyInHashCnt",i=-1,l=onlyInHashCnt})
+   b.postEvent(receiver.lockedByOtherProcsCnt,{s="lockedByOtherProcsCnt",i=-1,l=lockedByOtherProcsCnt})
 
+   -- Step 6: Calculate final result and post to appResultWidgets
+   if dllOk and failCnt == 0 and onlyOnDiskCnt == 0 and onlyInHashCnt == 0 and
+      lockedByOtherProcsCnt == 0 then
+      -- all good
+      b.postEvent(receiver.finalResult,{s="The "..VERSION.." Software Installation is valid.",i=1})
+   else
+      b.postEvent(receiver.finalResult,{s="The "..VERSION.." Software Installation is corrupted.",i=0})
+   end
 
    -- Outtro: GUI-Update runButton and statusBar
    outtro()
 end
 
 function appWorkerThread.run()
-   -- Get the raw C++ pointer to the wxWidget to send events to
-   local logOutputPtr = bridge.getPointer(handles["logOutput"])
-   local runButtonPtr = bridge.getPointer(handles["runButton"])
-   local statusBarPtr = bridge.getPointer(handles["statusBar"])
-   local passfailDllPtr = bridge.getPointer(handles["passfailDll"])
-   local dllPath = values["dllPath"]
-   local rootPath = values["rootPath"]
-
    -- Generate the Lane and pass the current environment paths so it can find the DLLs
    local worker = lanes.gen("*", {package={path=package.path, cpath=package.cpath}}, task)
-   -- local worker = lanes.gen("*", task)
 
    -- Start the background thread
-   worker(logOutputPtr,runButtonPtr,statusBarPtr,dllPath,rootPath,
-	  passfailDllPtr)
+   worker(guiReceivers, guiValues)
 end
 
 return appWorkerThread

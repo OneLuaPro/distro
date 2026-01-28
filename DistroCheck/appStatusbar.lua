@@ -9,8 +9,8 @@ function appStatusbar.create(parent)
    parent:SetStatusText("Welcome to DistroCheck 1.0",0)
    parent:SetStatusText("Idle",1)
 
-   -- Register widget handle for worker thread
-   appWorkerThread.registerHandle("statusBar", parent)
+   -- Register event receiver
+   appWorkerThread.registerReceiver("statusBar", parent)
 
    parent:Connect(
       wx.wxEVT_THREAD,

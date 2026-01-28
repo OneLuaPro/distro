@@ -2,6 +2,8 @@ local appCmdWidgets = {}
 local wx = require("wx")
 local appWorkerThread = require("DistroCheck.appWorkerThread")
 local appLogWidgets = require("DistroCheck.appLogWidgets")
+local appSummaryWidgets = require("DistroCheck.appSummaryWidgets")
+local appResultWidgets = require("DistroCheck.appResultWidgets")
 
 -- wx.wxStandardPaths.Get():GetDataDir() returns installation folder of lua.exe
 -- DLL path is hard-coded by intention and must not be modified
@@ -27,11 +29,10 @@ function appCmdWidgets.create(parentSizer)
    -- Add to higher level element
    parentSizer:Add(sizer,1,wx.wxEXPAND)
 
-   -- Register widget handles
-   appWorkerThread.registerHandle("runButton", runButton)
+   -- Register event receivers and GUI values
+   appWorkerThread.registerReceiver("runButton", runButton)
    appWorkerThread.registerValues("dllPath", dllPath)
    appWorkerThread.registerValues("rootPath", rootPath)
-   
 
    -- Connect events
    runButton:Connect(
@@ -39,6 +40,8 @@ function appCmdWidgets.create(parentSizer)
       function()
 	 -- kick-off worker thread
 	 appLogWidgets.clear()
+	 appSummaryWidgets.reset()
+	 appResultWidgets.reset()
 	 appWorkerThread.run()
       end
    )

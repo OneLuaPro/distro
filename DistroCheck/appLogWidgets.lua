@@ -18,7 +18,7 @@ function appLogWidgets.create(parentSizer)
    -- Create elements
    logOutput = wx.wxTextCtrl(parentSizer:GetStaticBox(), wx.wxID_ANY, "",
 			     wx.wxDefaultPosition, wx.wxDefaultSize,
-			     wx.wxTE_READONLY + wx.wxTE_MULTILINE + 
+			     wx.wxTE_READONLY + wx.wxTE_MULTILINE +
 			     wx.wxHSCROLL)
    logOutput:SetFont(ttFont)
 
@@ -29,8 +29,8 @@ function appLogWidgets.create(parentSizer)
    -- Add to higher level element
    parentSizer:Add(sizer,1,wx.wxEXPAND)
 
-   -- Register widget handle for worker thread
-   appWorkerThread.registerHandle("logOutput", logOutput)
+   -- Register event receivers
+   appWorkerThread.registerReceiver("logOutput", logOutput)
 
    -- Connect events
    logOutput:Connect(
