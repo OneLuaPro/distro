@@ -70,7 +70,7 @@ endif()
 
 # ------------------------------------------------------------------------------
 # Project defintion
-project(distro)
+project(distro C)
 
 # ------------------------------------------------------------------------------
 # Other settings
@@ -127,6 +127,33 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/distro.lua.in
   ${CMAKE_CURRENT_BINARY_DIR}/distro.lua
 )
+
+# ------------------------------------------------------------------------------
+# distro core DLL
+add_library(core SHARED)
+# setup lua include directory
+target_include_directories(core PRIVATE ${LIBLUA_INCLUDEDIR})
+# setup platform-specific sources, compile and linker options
+if(WIN32 AND NOT MinGW)
+  # Important definitions for DLL and symbol export
+  add_definitions(-DLUA_BUILD_AS_DLL -DLUA_LIB)
+  # set deviating library output name
+  set_target_properties(core PROPERTIES PREFIX "")
+  set_target_properties(core PROPERTIES OUTPUT_NAME core)
+  # Compile options
+  target_compile_definitions(core PRIVATE
+    _WINDLL _WIN32 _CRT_SECURE_NO_WARNINGS)
+  # We silently assume all libs are available with headers and static lib
+  target_link_options(core PRIVATE /LIBPATH:${LIBLUA_LIBDIR} liblua.lib
+    wintrust.lib)
+else()
+  message(FATAL_ERROR "Not yet fully implemented.")
+endif()
+# plattform-independend sources
+target_sources(core PRIVATE core.c)
+# Install
+install(TARGETS core RUNTIME DESTINATION ${INSTALL_TOP_CDIR}/distro)
+
 
 # ------------------------------------------------------------------------------
 # Install 
