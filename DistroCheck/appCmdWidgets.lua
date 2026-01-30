@@ -12,7 +12,7 @@ local dllPath = rootPath .. "\\chksum.dll"
 
 function appCmdWidgets.create(parentSizer)
    -- Create elements
-   local label = wx.wxStaticText(parentSizer:GetStaticBox(), wx.wxID_ANY, "Checksum File")
+   local label = wx.wxStaticText(parentSizer:GetStaticBox(), wx.wxID_ANY, "Checksum Container")
    local path  = wx.wxTextCtrl(parentSizer:GetStaticBox(), wx.wxID_ANY, dllPath,
 			 wx.wxDefaultPosition, wx.wxDefaultSize,
 			 wx.wxTE_READONLY)
