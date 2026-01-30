@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Kritzel Kratzel.
+# Copyright (c) 2025-2026 Kritzel Kratzel.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in 
@@ -105,6 +105,9 @@ set(INSTALL_TOP_CDIR
   ${INSTALL_LIBDIR}/lua/${liblua_VERSION_MAJOR}.${liblua_VERSION_MINOR})
 set(INSTALL_TOP_LDIR
   ${INSTALL_DATAROOTDIR}/lua/${liblua_VERSION_MAJOR}.${liblua_VERSION_MINOR})
+# OneLuaPro-specific installation dirs
+set(INSTALL_APPDIR
+  "opt/DistroCheck" CACHE PATH "Installation directory for app")
 
 # ------------------------------------------------------------------------------
 # Report to user
@@ -160,4 +163,17 @@ install(TARGETS core RUNTIME DESTINATION ${INSTALL_TOP_CDIR}/distro)
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/distro.lua
   DESTINATION ${INSTALL_TOP_LDIR}
+)
+install(DIRECTORY
+  DistroCheck
+  DESTINATION ${INSTALL_APPDIR}
+  FILES_MATCHING
+  PATTERN "*.lua"
+  PATTERN "*.txt"
+  PATTERN "*.ico"
+)
+install(FILES
+  DistroCheck.lua
+  DistroCheck.bat
+  DESTINATION ${INSTALL_APPDIR}
 )

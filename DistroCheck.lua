@@ -19,7 +19,7 @@ local function main()
    -- create parent of everything with custom frame style
    local frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, "OneLuaPro DistroCheck",
 			    wx.wxDefaultPosition, wx.wxDefaultSize,
-			    wx.wxDEFAULT_FRAME_STYLE) -- - wx.wxRESIZE_BORDER - wx.wxMAXIMIZE_BOX)
+			    wx.wxDEFAULT_FRAME_STYLE)
    frame:SetBackgroundColour(wx.wxNullColour)	-- change to default UI-gray
    -- Load and set the icon file and other stuff
    local scriptPath = arg[0]
@@ -49,7 +49,6 @@ local function main()
    -- Set frame to last size & position
    appConfig.setFrame()
    frame:Show(true)
-   collectgarbage("collect")
 end
 main()
 wx.wxGetApp():MainLoop()

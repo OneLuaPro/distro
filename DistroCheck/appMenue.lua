@@ -30,15 +30,12 @@ function appMenue.create(parent)
    parent:Connect(
       wx.wxID_ABOUT, wx.wxEVT_COMMAND_MENU_SELECTED,
       function ()
-	 -- local t = {
-	 --    "IFA-Cockpit is part of\n\n",
-	 --    string.format("%s %s\n",version.getName(), version.getVersion()),
-	 --    string.format("(%s / %s)\n\n",version.getMatnum(),version.getPartnum()),
-	 --    string.format("%s\n\n",version.getCopyright()),
-	 --    -- string.format("IFA-Cockpit uses %s built with %s",
-	 --    -- 	      wxlua.wxLUA_VERSION_STRING,wx.wxVERSION_STRING),
-	 -- }
-	 wx.wxMessageBox("DistroCheck v1.0",
+	 wx.wxMessageBox("DistroCheck v1.0\n\n"..
+			 "This utility verifies the integrity of the OneLuaPro "..
+			 "installation. It cross-references each file against "..
+			 "SHA256 checksums generated during the build process to "..
+			 "detect corruption or missing data.\n\n"..
+			 "Copyright (c) 2026 The OneLuaPro project authors",
 			 "About DistroCheck",
 			 wx.wxOK + wx.wxICON_INFORMATION,
 			 parent)

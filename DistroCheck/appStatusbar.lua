@@ -6,7 +6,7 @@ function appStatusbar.create(parent)
    -- create a simple status bar
    parent:CreateStatusBar(2)
    parent:SetStatusWidths({-1, 60})
-   parent:SetStatusText("Welcome to DistroCheck 1.0",0)
+   parent:SetStatusText("Welcome to DistroCheck v1.0",0)
    parent:SetStatusText("Idle",1)
 
    -- Register event receiver

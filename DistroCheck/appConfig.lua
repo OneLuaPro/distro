@@ -34,6 +34,9 @@ function appConfig.setFrame()
       -- Apply to frame
       frame:SetSize(wx.wxSize(tonumber(w), tonumber(h)))
       frame:Move(wx.wxPoint(tonumber(x), tonumber(y)))
+   else
+      -- use suggested default size
+      frame:SetSize(wx.wxSize(720, 550))
    end
 end
 
