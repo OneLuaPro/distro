@@ -20,15 +20,21 @@ OneLuaPro distribution information and installation verification
 
 DistroCheck is accessible directly from the **Windows Start Menu**. It is written entirely in Lua and leverages the native features and modules of the OneLuaPro installation it is bundled with. To ensure maximum security, DistroCheck itself is tamper-proof: all its internal files are included within the central checksum container. This container is delivered as a **signed DLL**, providing a robust layer of protection against unauthorized manipulation of the verification logic itself.
 
-![DistroCheck GUI Screenshot 1](assets/OLP_DistroCheck01.png)
+<p align="center">
+  <img src="./assets/OLP_DistroCheck01.png" alt="DistroCheck GUI">
+</p>
 
 Simply hit the `Run` button to launch the verification process.
 
-![DistroCheck GUI Screenshot 2](assets/OLP_DistroCheck02.png)
+<p align="center">
+  <img src="./assets/OLP_DistroCheck02.png" alt="DistroCheck GUI">
+</p>
 
 The following screenshot shows an example of a compromised OneLuaPro installation.
 
-![DistroCheck GUI Screenshot 3](assets/OLP_DistroCheck03.png)
+<p align="center">
+  <img src="./assets/OLP_DistroCheck03.png" alt="DistroCheck GUI">
+</p>
 
 ## Lua-Module `distro`
 
