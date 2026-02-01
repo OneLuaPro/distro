@@ -1,3 +1,4 @@
+---------------------------------------------------------------------------------
 -- Distro-Check --
 ---------------------------------------------------------------------------------
 -- Check OneLuaPro version and require global modules from it
@@ -22,9 +23,7 @@ local function main()
 			    wx.wxDEFAULT_FRAME_STYLE)
    frame:SetBackgroundColour(wx.wxNullColour)	-- change to default UI-gray
    -- Load and set the icon file and other stuff
-   local scriptPath = arg[0]
-   local scriptDir = scriptPath:match("(.*[/\\])") or "./"
-   local iconPath = scriptDir .. "DistroCheck/assets/blocks-icons-msw.ico"
+   local iconPath = "DistroCheck/assets/blocks-icons-msw.ico"
    local icon = wx.wxIcon(iconPath, wx.wxBITMAP_TYPE_ICO)
    frame:SetIcon(icon)
    -- user simply clicked the close main window symbol

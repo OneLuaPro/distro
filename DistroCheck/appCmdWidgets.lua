@@ -5,9 +5,15 @@ local appLogWidgets = require("DistroCheck.appLogWidgets")
 local appSummaryWidgets = require("DistroCheck.appSummaryWidgets")
 local appResultWidgets = require("DistroCheck.appResultWidgets")
 
--- wx.wxStandardPaths.Get():GetDataDir() returns installation folder of lua.exe
--- DLL path is hard-coded by intention and must not be modified
-local rootPath = wx.wxStandardPaths.Get():GetDataDir():match("(.*)[/\\]") -- e.g. C:\Apps\OneLuaPro
+-- Get OneLuaPro Installation Prefix, e.g. C:\Apps\OneLuaPro
+-- Case A:
+--    wx.wxStandardPaths.Get():GetDataDir() returns installation folder of lua.exe
+--    :match("(.*)[/\\]") returns the rootPath
+-- Case B:
+--    global var ONELUAPRO_PREFIX is set by launcher executable DistroCheck.exe
+-- In any case - DLL path is hard-coded by intention and must not be modified
+local rootPath = _G.ONELUAPRO_PREFIX or
+   wx.wxStandardPaths.Get():GetDataDir():match("(.*)[/\\]")
 local dllPath = rootPath .. "\\chksum.dll"
 
 function appCmdWidgets.create(parentSizer)

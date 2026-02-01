@@ -70,7 +70,7 @@ endif()
 
 # ------------------------------------------------------------------------------
 # Project defintion
-project(distro C)
+project(distro C CXX)
 
 # ------------------------------------------------------------------------------
 # Other settings
@@ -156,6 +156,37 @@ endif()
 target_sources(core PRIVATE core.c)
 # Install
 install(TARGETS core RUNTIME DESTINATION ${INSTALL_TOP_CDIR}/distro)
+
+
+
+# ------------------------------------------------------------------------------
+# DistroCheck Launcher (.exe instead of .bat)
+if(WIN32)
+  # Das Target erstellen (WIN32 verhindert das Konsolenfenster)
+  add_executable(DistroCheckLauncher WIN32
+    DistroCheck/assets/blocks-icons-msw.rc
+    DistroCheck.cpp)
+  # add_executable(DistroCheckLauncher DistroCheck.cpp)
+
+  # Header-Pfad von liblua nutzen
+  target_include_directories(DistroCheckLauncher PRIVATE ${LIBLUA_INCLUDEDIR})
+
+  # Linker-Einstellungen (analog zu deiner 'core' library)
+  target_link_directories(DistroCheckLauncher PRIVATE ${LIBLUA_LIBDIR})
+  
+  # Verlinken gegen die Lua-Library (meist liblua.lib oder lua54.lib)
+  # Da dein Script oben 'liblua.lib' explizit nennt, nutzen wir das hier auch:
+  target_link_libraries(DistroCheckLauncher PRIVATE liblua.lib pathcch.lib)
+
+  # Falls du VS nutzt: Defines für DLL-Nutzung (falls Lua eine DLL ist)
+  target_compile_definitions(DistroCheckLauncher PRIVATE LUA_BUILD_AS_DLL)
+
+  # Output-Name auf "DistroCheck" setzen, damit die Datei DistroCheck.exe heißt
+  set_target_properties(DistroCheckLauncher PROPERTIES OUTPUT_NAME "DistroCheck")
+
+  # Installieren in den App-Ordner (ersetzt oder ergänzt die .bat)
+  install(TARGETS DistroCheckLauncher RUNTIME DESTINATION ${INSTALL_APPDIR})
+endif()
 
 
 # ------------------------------------------------------------------------------
