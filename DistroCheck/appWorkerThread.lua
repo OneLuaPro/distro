@@ -82,8 +82,8 @@ local function task(receiver, values)
    printf("Scanning directory %s:",values.rootPath)
    b.postEvent(receiver.logGauge,{i=0,l=0}) -- puts gauge into indeterminate (pulsing) mode
    local cntFiles = 0
-   -- prefixPattern to remove leading installation path prefix
-   local prefixPattern = "^" .. (values.rootPath.."\\"):gsub("\\", "%%\\")	-- constant
+   -- escaped to remove leading installation path prefix
+   local escaped = (values.rootPath:gsub("([^%w])", "%%%1")).."\\"
    -- define recursive function
    local function getFilesRecursive(path, fileList)
       fileList = fileList or {}
@@ -97,9 +97,9 @@ local function task(receiver, values)
 	       getFilesRecursive(fullPath, fileList)
             elseif attr.mode == "file" then
 	       -- File found, save path to table (windos path notation), use relative path only
-	       fileList[fullPath:gsub("/", "\\"):gsub(prefixPattern,"")] = 0
-	       -- :gsub("/", "\\") ... all slashes to backslashes
-	       -- :gsub(prefixPattern,"") ... remove constant path prefix
+	       fileList[(fullPath:gsub("/", "\\"):gsub(escaped, ""))] = 0
+	       -- :gsub("/", "\\")   ... all slashes to backslashes
+	       -- :gsub(escaped, "") ... removes constant path prefix
 	       cntFiles = cntFiles + 1
             end
 	 end
@@ -137,7 +137,7 @@ local function task(receiver, values)
 	 -- file could not be opened, maybe locked by other process
 	 lockedByOtherProcsCnt = lockedByOtherProcsCnt + 1
 	 -- save errmsg as value to current key
-	 lockedByOtherProcs[entry:gsub(prefixPattern,"")] = tostring(err)
+	 lockedByOtherProcs[entry] = tostring(err)
       end
    end
    printf(" DONE\n")
