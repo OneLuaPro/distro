@@ -196,7 +196,7 @@ local function task(receiver, values)
       printf("| Files on Disk but not in Checksum Container |\n")
       printf("+---------------------------------------------+\n")
       for path, hash in pairs(onlyOnDisk) do
-	 printf("[FAIL] %s\n",values.rootPath.."\\"..path)
+	 printf("[WARN] %s\n",values.rootPath.."\\"..path)
 	 printf("       Actual digest  : %s\n",hash)
       end
    end
@@ -236,9 +236,16 @@ local function task(receiver, values)
    if dllOk and failCnt == 0 and onlyOnDiskCnt == 0 and onlyInHashCnt == 0 and
       lockedByOtherProcsCnt == 0 then
       -- all good
-      b.postEvent(receiver.finalResult,{s="The "..VERSION.." Software Installation is valid.",i=1})
+      b.postEvent(receiver.finalResult,{s="The "..VERSION.." installation is valid.",i=1})
+   elseif dllOk and failCnt == 0 and onlyOnDiskCnt > 0 and onlyInHashCnt == 0 and
+      lockedByOtherProcsCnt == 0 then
+      -- all good, but with extra stuff outside OneLuaPro world
+      b.postEvent(
+	 receiver.finalResult,
+	 {s="The "..VERSION.." installation is valid, but conatins untracked files.",i=2})
    else
-      b.postEvent(receiver.finalResult,{s="The "..VERSION.." Software Installation is corrupted.",i=0})
+      -- not good
+      b.postEvent(receiver.finalResult,{s="The "..VERSION.." installation is corrupted.",i=0})
    end
 
    -- Outtro: GUI-Update runButton and statusBar

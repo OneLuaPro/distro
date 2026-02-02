@@ -53,7 +53,7 @@ function appSummaryWidgets.create(parentSizer)
 
    -- Create elements
    local label1 = wx.wxStaticText(parentSizer:GetStaticBox(), wx.wxID_ANY,
-				  "Checksum DLL Signature Verification",
+				  "Checksum Container Signature Verification",
 				  wx.wxDefaultPosition,wx.wxDefaultSize)
    result1 = wx.wxStaticText(parentSizer:GetStaticBox(), wx.wxID_ANY, nye,
 			     wx.wxDefaultPosition,wx.wxDefaultSize,wx.wxALIGN_RIGHT)

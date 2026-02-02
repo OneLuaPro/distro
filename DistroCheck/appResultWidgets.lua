@@ -7,7 +7,8 @@ local boldFont <const> = wx.wxFont(wx.wxFontInfo():Bold())
 local green <const> = wx.wxColour("#13a256")
 local red <const> = wx.wxColour("#e40521")
 local default <const> = wx.wxNullColour
-local colorTab = {[-1]=default, [0]=red, [1]=green}
+local orange <const> = wx.wxColour("#f58220")
+local colorTab = {[-1]=default, [0]=red, [1]=green, [2]=orange}
 
 local label, sizer
 

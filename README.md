@@ -96,6 +96,33 @@ if not isCompatible then
 end
 ```
 
+## Lua Module `distro.core`
+
+The `distro.core` module provides low-level utilities for Windows PE file verification and resource extraction. This module was specifically made for DistroCheck and contains two functions for Windows DLL handling:
+
+**`.verify(path)`**
+
+Verifies the digital signature and integrity of a **Portable Executable (PE)** file (e.g., EXE, DLL, SYS). It utilizes the Windows WinVerifyTrust API to validate the trust chain, authenticity, and timestamp of the provided file.
+
+- **Returns:** `boolean` (true if trusted), `nil|string` (error message with Windows error code on failure).
+
+**`.getHashes(dllPath [, swapKeys])`**
+
+Extracts a list of file digests from a specific resource (ID 101, type `RT_RCDATA`) embedded within a PE file. It parses the resource data linewise, expecting a separator format (e.g., `hash *path`).
+
+- **Parameters:**
+  - `dllPath`: Path to the target file.
+  - `swapKeys`: Optional boolean. If `true`, the resulting table uses file paths as keys (`table[path] = hash`). If `false` or omitted, it uses hashes as keys (`table[hash] = path`).
+- **Returns:** `table` (containing the parsed pairs) or `nil, string` on error (e.g., file not found or resource missing).
+
+Code example:
+
+```lua
+local dc = require("distro.core")
+local dllOk, errmsg = dc.verify("C:\\path\\file.dll")
+local dllDigests, errmsg = dc.getHashes("C:\\path\\file.dll", true) -- table[path] = hash
+```
+
 ## License
 
 See `https://github.com/OneLuaPro/distro/blob/master/LICENSE`.
