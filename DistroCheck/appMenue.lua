@@ -2,6 +2,7 @@
 -- module appmenue
 local appMenue = {}
 local wx = require("wx")
+local distro = require("distro")
 
 function appMenue.create(parent)
 
@@ -30,7 +31,7 @@ function appMenue.create(parent)
    parent:Connect(
       wx.wxID_ABOUT, wx.wxEVT_COMMAND_MENU_SELECTED,
       function ()
-	 wx.wxMessageBox("DistroCheck v1.0\n\n"..
+	 wx.wxMessageBox("DistroCheck for "..distro._VERSION.."\n\n"..
 			 "This utility verifies the integrity of the OneLuaPro "..
 			 "installation. It cross-references each file against "..
 			 "SHA256 checksums generated during the build process to "..

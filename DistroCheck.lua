@@ -1,15 +1,7 @@
 ---------------------------------------------------------------------------------
--- Distro-Check --
+-- Distro-Check (requires at least OneLuaPro 5.4.8.3)
 ---------------------------------------------------------------------------------
--- Check OneLuaPro version and require global modules from it
-local ok, distro = pcall(require,"distro")
-if not ok or distro._VERSION < "OneLuaPro 5.4.8.3" then
-   print("\nERROR: DistroCheck requires at least OneLuaPro 5.4.8.3.\n")
-   os.exit(1)
-end
 local wx = require("wx")
--- local utils = require("pl.utils")	-- Penlight
--- local path = require("pl.path")		-- Penlight
 local appMenue = require("DistroCheck.appMenue")
 local appStatusbar = require("DistroCheck.appStatusbar")
 local appConfig = require("DistroCheck.appConfig")
