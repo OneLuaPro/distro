@@ -15,7 +15,7 @@ local function main()
 			    wx.wxDEFAULT_FRAME_STYLE)
    frame:SetBackgroundColour(wx.wxNullColour)	-- change to default UI-gray
    -- Load and set the icon file and other stuff
-   local iconPath = "DistroCheck/assets/blocks-icons-msw.ico"
+   local iconPath = "DistroCheck/assets/lua-logo-olp-dist.ico"
    local icon = wx.wxIcon(iconPath, wx.wxBITMAP_TYPE_ICO)
    frame:SetIcon(icon)
    -- user simply clicked the close main window symbol

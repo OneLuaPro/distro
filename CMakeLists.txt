@@ -164,7 +164,7 @@ install(TARGETS core RUNTIME DESTINATION ${INSTALL_TOP_CDIR}/distro)
 if(WIN32)
   # Das Target erstellen (WIN32 verhindert das Konsolenfenster)
   add_executable(DistroCheckLauncher WIN32
-    DistroCheck/assets/blocks-icons-msw.rc
+    DistroCheck/assets/lua-logo-olp-dist.rc
     DistroCheck.cpp)
   # add_executable(DistroCheckLauncher DistroCheck.cpp)
 
