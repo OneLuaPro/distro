@@ -176,6 +176,14 @@ local function task(receiver, values)
       onlyOnDisk["chksum.dll"] = nil
       onlyOnDiskCnt = onlyOnDiskCnt -1
    end
+   -- exclude Uninstall.exe from onlyOnDisk. this file is added by CPack NSIS
+   -- installer after everything is build in OneLuaPro distribution. It cannot
+   -- be tracked by DistroCheck. Problem does not occurr if MSI-installer or
+   -- ZIP-installer is used.
+   if onlyOnDisk["Uninstall.exe"] then
+      onlyOnDisk["Uninstall.exe"] = nil
+      onlyOnDiskCnt = onlyOnDiskCnt -1
+   end
    printf(" DONE\n")
 
    -- Step 6: Output any irregularities to logWindow
