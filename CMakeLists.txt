@@ -136,55 +136,52 @@ configure_file(
 add_library(core SHARED)
 # setup lua include directory
 target_include_directories(core PRIVATE ${LIBLUA_INCLUDEDIR})
+# plattform-independend sources
+target_sources(core PRIVATE core.c)
 # setup platform-specific sources, compile and linker options
 if(WIN32 AND NOT MinGW)
   # Important definitions for DLL and symbol export
-  add_definitions(-DLUA_BUILD_AS_DLL -DLUA_LIB)
+  target_compile_definitions(core PRIVATE
+    LUA_BUILD_AS_DLL LUA_LIB
+    _WINDLL _WIN32 _CRT_SECURE_NO_WARNINGS
+  )
   # set deviating library output name
   set_target_properties(core PROPERTIES PREFIX "")
   set_target_properties(core PROPERTIES OUTPUT_NAME core)
-  # Compile options
-  target_compile_definitions(core PRIVATE
-    _WINDLL _WIN32 _CRT_SECURE_NO_WARNINGS)
   # We silently assume all libs are available with headers and static lib
-  target_link_options(core PRIVATE /LIBPATH:${LIBLUA_LIBDIR} liblua.lib
-    wintrust.lib)
+  target_link_directories(core PRIVATE ${LIBLUA_LIBDIR})
+  target_link_libraries(core PRIVATE liblua wintrust)
 else()
   message(FATAL_ERROR "Not yet fully implemented.")
 endif()
-# plattform-independend sources
-target_sources(core PRIVATE core.c)
 # Install
 install(TARGETS core RUNTIME DESTINATION ${INSTALL_TOP_CDIR}/distro)
-
-
 
 # ------------------------------------------------------------------------------
 # DistroCheck Launcher (.exe instead of .bat)
 if(WIN32)
-  # Das Target erstellen (WIN32 verhindert das Konsolenfenster)
+  # Create the target (WIN32 flag prevents the console window from appearing)
   add_executable(DistroCheckLauncher WIN32
     DistroCheck/assets/lua-logo-olp-dist.rc
     DistroCheck.cpp)
-  # add_executable(DistroCheckLauncher DistroCheck.cpp)
 
-  # Header-Pfad von liblua nutzen
+  # Use header paths from liblua
   target_include_directories(DistroCheckLauncher PRIVATE ${LIBLUA_INCLUDEDIR})
 
-  # Linker-Einstellungen (analog zu deiner 'core' library)
+  # Linker settings (analogous to the 'core' library)
   target_link_directories(DistroCheckLauncher PRIVATE ${LIBLUA_LIBDIR})
   
-  # Verlinken gegen die Lua-Library (meist liblua.lib oder lua54.lib)
-  # Da dein Script oben 'liblua.lib' explizit nennt, nutzen wir das hier auch:
+  # Link against the Lua library (typically liblua.lib or lua54.lib)
+  # Using 'liblua.lib' explicitly as defined in your script above:
   target_link_libraries(DistroCheckLauncher PRIVATE liblua.lib pathcch.lib)
 
-  # Falls du VS nutzt: Defines für DLL-Nutzung (falls Lua eine DLL ist)
+  # If using VS: Definitions for DLL usage (if Lua is built as a DLL)
   target_compile_definitions(DistroCheckLauncher PRIVATE LUA_BUILD_AS_DLL)
 
-  # Output-Name auf "DistroCheck" setzen, damit die Datei DistroCheck.exe heißt
+  # Set output name to "DistroCheck" so the binary is named DistroCheck.exe
   set_target_properties(DistroCheckLauncher PROPERTIES OUTPUT_NAME "DistroCheck")
 
-  # Installieren in den App-Ordner (ersetzt oder ergänzt die .bat)
+  # Install into the app directory (replaces or supplements the .bat file)
   install(TARGETS DistroCheckLauncher RUNTIME DESTINATION ${INSTALL_APPDIR})
 endif()
 
