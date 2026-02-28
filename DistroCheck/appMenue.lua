@@ -24,7 +24,7 @@ function appMenue.create(parent)
    -- Menue Help
    local helpMenu = wx.wxMenu()
    -- Help -> About
-   local helpItem = wx.wxMenuItem(helpMenu, wx.wxID_ABOUT, "About", "About CheckDistro")
+   local helpItem = wx.wxMenuItem(helpMenu, wx.wxID_ABOUT, "About", "About DistroCheck")
    local helpIcon = wx.wxArtProvider.GetBitmap(wx.wxART_HELP, wx.wxART_MENU)
    helpItem:SetBitmap(helpIcon)
    helpMenu:Append(helpItem)
