@@ -160,6 +160,9 @@ install(TARGETS core RUNTIME DESTINATION ${INSTALL_TOP_CDIR}/distro)
 # ------------------------------------------------------------------------------
 # DistroCheck Launcher (.exe instead of .bat)
 if(WIN32)
+  # User option (Default: OFF for Windows 7 compatibility)
+  option(USE_PATHCCH "Use modern PathCch Library (requires Windows 8+)" OFF)
+
   # Create the target (WIN32 flag prevents the console window from appearing)
   add_executable(DistroCheckLauncher WIN32
     DistroCheck/assets/lua-logo-olp-dist.rc
@@ -167,8 +170,16 @@ if(WIN32)
 
   target_include_directories(DistroCheckLauncher PRIVATE ${LIBLUA_INCLUDEDIR})
   target_link_directories(DistroCheckLauncher PRIVATE ${LIBLUA_LIBDIR})
-  target_link_libraries(DistroCheckLauncher PRIVATE liblua.lib pathcch.lib)
   set_target_properties(DistroCheckLauncher PROPERTIES OUTPUT_NAME "DistroCheck")
+
+  if(USE_PATHCCH)
+    # pathcch requires Windows 8 and upwards
+    target_compile_definitions(DistroCheckLauncher PRIVATE USE_PATHCCH)
+    target_link_libraries(DistroCheckLauncher PRIVATE liblua pathcch)
+  else()
+    # Shlwapi is for Windows 7 upwards compatible
+    target_link_libraries(DistroCheckLauncher PRIVATE liblua shlwapi)
+  endif()
 
   install(TARGETS DistroCheckLauncher RUNTIME DESTINATION ${INSTALL_APPDIR})
 endif()

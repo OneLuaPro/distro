@@ -4,9 +4,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <shlwapi.h>
-#include <pathcch.h>
 #include <string>
 #include <vector>
+
+#ifdef USE_PATHCCH
+// newer, but incompatible with Win7 due to missing api-ms-win-core-path-l1-1-0.dll
+#include <pathcch.h>
+#define MAX_PATH_BUFFER PATHCCH_MAX_CCH
+#else
+// older, but compatible with Win7
+#include <shlwapi.h>
+#define MAX_PATH_BUFFER 32768 // same as PATHCCH_MAX_CCH
+#endif
 
 #include <lua.hpp>
 
@@ -77,20 +86,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
   // Get base path of OneLuaPro distribution, assuming a fixed place of DistroCheck.exe
   // within this directory tree under <INSTALL_PREFIX>/opt/DistroCheck
-  WCHAR installPrefix[PATHCCH_MAX_CCH];
-  if (!GetModuleFileNameW(NULL, installPrefix, PATHCCH_MAX_CCH)) {
+  WCHAR installPrefix[MAX_PATH_BUFFER];
+  if (!GetModuleFileNameW(NULL, installPrefix, MAX_PATH_BUFFER)) {
     MessageBox(NULL,
 	       TEXT("Couldn't find the path to " appName),
 	       TEXT("Failed to start " appName),
 	       MB_OK|MB_ICONERROR);
     return 1;
   }
-  PathCchRemoveFileSpec(installPrefix,PATHCCH_MAX_CCH);
+#ifdef USE_PATHCCH
+  PathCchRemoveFileSpec(installPrefix,MAX_PATH_BUFFER);
   // remove /opt/DistroCheck from path in installPrefix...
-  PathCchRemoveFileSpec(installPrefix,PATHCCH_MAX_CCH);
-  PathCchRemoveFileSpec(installPrefix,PATHCCH_MAX_CCH);
+  PathCchRemoveFileSpec(installPrefix,MAX_PATH_BUFFER);
+  PathCchRemoveFileSpec(installPrefix,MAX_PATH_BUFFER);
   // ... to yield OneLuaPro (variable) base install directory
   // printf("Base path in installPrefix = %ls\n",installPrefix);
+#else
+  PathRemoveFileSpecW(installPrefix);
+  SetCurrentDirectoryW(installPrefix);
+  PathRemoveFileSpecW(installPrefix);
+  PathRemoveFileSpecW(installPrefix);
+#endif
   std::string utf8Prefix = WideCharToUTF8(installPrefix);
 
   // Create Lua state
