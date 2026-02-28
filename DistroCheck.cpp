@@ -69,8 +69,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   // https://speedyleion.github.io/c/c++/windows/2021/07/11/WinMain-and-stdout.html
   if(!GetStdHandle(STD_OUTPUT_HANDLE)){
     if(AttachConsole(ATTACH_PARENT_PROCESS)){
-      freopen("CONOUT$","wb",stdout);
-      freopen("CONOUT$","wb",stderr);
+      FILE* fp;
+      freopen_s(&fp, "CONOUT$","wb",stdout);
+      freopen_s(&fp, "CONOUT$","wb",stderr);
     }
   }
 

@@ -165,23 +165,11 @@ if(WIN32)
     DistroCheck/assets/lua-logo-olp-dist.rc
     DistroCheck.cpp)
 
-  # Use header paths from liblua
   target_include_directories(DistroCheckLauncher PRIVATE ${LIBLUA_INCLUDEDIR})
-
-  # Linker settings (analogous to the 'core' library)
   target_link_directories(DistroCheckLauncher PRIVATE ${LIBLUA_LIBDIR})
-  
-  # Link against the Lua library (typically liblua.lib or lua54.lib)
-  # Using 'liblua.lib' explicitly as defined in your script above:
   target_link_libraries(DistroCheckLauncher PRIVATE liblua.lib pathcch.lib)
-
-  # If using VS: Definitions for DLL usage (if Lua is built as a DLL)
-  target_compile_definitions(DistroCheckLauncher PRIVATE LUA_BUILD_AS_DLL)
-
-  # Set output name to "DistroCheck" so the binary is named DistroCheck.exe
   set_target_properties(DistroCheckLauncher PROPERTIES OUTPUT_NAME "DistroCheck")
 
-  # Install into the app directory (replaces or supplements the .bat file)
   install(TARGETS DistroCheckLauncher RUNTIME DESTINATION ${INSTALL_APPDIR})
 endif()
 
