@@ -172,6 +172,13 @@ if(WIN32)
   target_link_directories(DistroCheckLauncher PRIVATE ${LIBLUA_LIBDIR})
   set_target_properties(DistroCheckLauncher PROPERTIES OUTPUT_NAME "DistroCheck")
 
+  # Enable DELAYLOAD
+  target_link_options(DistroCheckLauncher PRIVATE
+    "LINKER:/DELAYLOAD:lua.dll"
+    "LINKER:/DEPENDENTLOADFLAG:0x0"
+  )
+  target_link_libraries(DistroCheckLauncher PRIVATE delayimp.lib)
+
   if(USE_PATHCCH)
     # pathcch requires Windows 8 and upwards
     target_compile_definitions(DistroCheckLauncher PRIVATE USE_PATHCCH)
