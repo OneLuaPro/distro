@@ -95,11 +95,11 @@ static void SetupDeterministicDllResolution(){
        * The LUAI_TOWSTR macros inject the version numbers from 'lua.h' at
        * compile time. */
       wchar_t dllDir[MAX_PATH_BUFFER];
-      _snwprintf(dllDir, MAX_PATH_BUFFER,
-		 L"%s\\..\\..\\lib\\lua\\"
-		 LUAI_TOWSTR(LUA_VERSION_MAJOR_N)
-		 L"."
-		 LUAI_TOWSTR(LUA_VERSION_MINOR_N),exePath);
+      _snwprintf_s(dllDir, MAX_PATH_BUFFER,_TRUNCATE,
+		   L"%s\\..\\..\\lib\\lua\\"
+		   LUAI_TOWSTR(LUA_VERSION_MAJOR_N)
+		   L"."
+		   LUAI_TOWSTR(LUA_VERSION_MINOR_N),exePath);
       /* Inject custom search path at the top of the DLL search order.
        * Since lua.dll is delay-loaded, it will be successfully
        * found in the version-specific sub-directory. */
